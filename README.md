@@ -28,3 +28,6 @@ type IPerson = t.TSType<typeof personSchema>;
 //     friends: string[];
 // }
 ```
+
+## License
+MIT. See LICENSE.
