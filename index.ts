@@ -45,19 +45,19 @@ export namespace t {
         // a non-negative integer
         minLength?: number;
         pattern?: string;
-        // TODO: add more
+        // FIXME: add more
 
         enum?: Array<TSType<StringType>>;
     }
 
     export interface BooleanType extends BaseType {
         type: 'boolean';
-        enum?: boolean[];
+        enum?: Array<TSType<BooleanType>>;
     }
 
     export interface NullType extends BaseType {
         type: 'null';
-        enum?: null[];
+        enum?: Array<TSType<NullType>>;
     }
 
     export interface ArrayTypeLike extends BaseType {
@@ -78,6 +78,7 @@ export namespace t {
     interface ObjectTypeLike extends BaseType {
         type: 'object';
         properties?: ObjectProperties;
+        // FIXME: enum?: Array<object>;
     }
 
     export interface ObjectType<T extends ObjectProperties> extends BaseType {
@@ -86,11 +87,12 @@ export namespace t {
         properties?: T;
         // Omitting this keyword has the same behavior as an empty array.
         required?: Array<keyof T>;
+        // FIXME: enum?: Array<object>;
     }
 
     export type SchemaTypeLike = boolean | StringType | NumberType | IntegerType | BooleanType | NullType | ArrayTypeLike | ObjectTypeLike;
 
-    export type TSType<T> = T extends true ? true
+    export type TSType<T extends BaseType | boolean> = T extends true ? true
                 : T extends false ? false
                 : T extends StringType ? string 
                 : T extends NumberType ? number 
@@ -101,7 +103,7 @@ export namespace t {
                 : T extends ObjectType<infer U> ? {[key in keyof U]: TSType<U[key]>}
                 : never
 
-    interface SchemaArrayWrap<U> extends Array<TSType<U>> {}
+    interface SchemaArrayWrap<U extends BaseType | boolean> extends Array<TSType<U>> {}
 }
 
 export namespace s {
