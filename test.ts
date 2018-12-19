@@ -134,6 +134,8 @@ namespace meta {
     const personSchema = s.object({
         'properties': {
             'name': s.string(),
+            // [first name, last name]
+            'fullName': s.tuple({'items': s.items(s.string(), s.string())}),
             'age': s.number(),
             'friends': s.array({'items': s.string()}),
         }
@@ -142,9 +144,12 @@ namespace meta {
     type IPerson = t.TSType<typeof personSchema>;
 
     // IPerson is equivalent to
-    // interface IPerson {
-    //     name: string;
-    //     age: number;
-    //     friends: string[];
-    // }
+    interface IPerson2 {
+        name: string;
+        fullName: [string, string];
+        age: number;
+        friends: string[];
+    }
+
+    meta.equal<IPerson, IPerson2>(true);
 }

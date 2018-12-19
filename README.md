@@ -14,6 +14,8 @@ import {s, t} from 'json-schema-ts';
 const personSchema = s.object({
     'properties': {
         'name': s.string(),
+        // [first name, last name]
+        'fullName': s.tuple({'items': s.items(s.string(), s.string())}),
         'age': s.number(),
         'friends': s.array({'items': s.string()}),
     }
@@ -24,6 +26,7 @@ type IPerson = t.TSType<typeof personSchema>;
 // IPerson is equivalent to
 // interface IPerson {
 //     name: string;
+//     fullName: [string, string];
 //     age: number;
 //     friends: string[];
 // }

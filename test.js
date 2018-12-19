@@ -103,14 +103,11 @@ var meta;
     var personSchema = index_1.s.object({
         'properties': {
             'name': index_1.s.string(),
+            // [first name, last name]
+            'fullName': index_1.s.tuple({ 'items': index_1.s.items(index_1.s.string(), index_1.s.string()) }),
             'age': index_1.s.number(),
             'friends': index_1.s.array({ 'items': index_1.s.string() }),
         }
     });
-    // IPerson is equivalent to
-    // interface IPerson {
-    //     name: string;
-    //     age: number;
-    //     friends: string[];
-    // }
+    meta.equal(true);
 }
