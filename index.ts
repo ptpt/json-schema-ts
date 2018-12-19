@@ -62,15 +62,27 @@ export namespace t {
 
     export interface ArrayTypeLike extends BaseType {
         type: 'array';
-        items?: SchemaTypeLike | SchemaTypeLike[];
-        enum?: SchemaArrayWrap<SchemaTypeLike>;
+        items?: SchemaTypeLike;
+        enum?: ArrayWrap<SchemaTypeLike>;
     }
 
     export interface ArrayType<T extends SchemaTypeLike> extends BaseType {
         type: 'array';
         // Omitting this keyword has the same behavior as an empty schema.
-        items?: T | T[];
-        enum?: SchemaArrayWrap<T>;
+        items?: T;
+        enum?: ArrayWrap<T>;
+    }
+
+    export interface TupleTypeLike extends BaseType {
+        type: 'array';
+        // Omitting this keyword has the same behavior as an empty schema.
+        items?: SchemaTypeLike[];
+    }
+
+    export interface TupleType<T extends SchemaTypeLike[]> extends BaseType {
+        type: 'array';
+        // Omitting this keyword has the same behavior as an empty schema.
+        items?: T;
     }
 
     export type ObjectProperties = {[key: string]: SchemaTypeLike}
@@ -90,20 +102,24 @@ export namespace t {
         // FIXME: enum?: Array<object>;
     }
 
-    export type SchemaTypeLike = boolean | StringType | NumberType | IntegerType | BooleanType | NullType | ArrayTypeLike | ObjectTypeLike;
+    export type SchemaTypeLike = boolean | StringType | NumberType | IntegerType | BooleanType | NullType | ArrayTypeLike | TupleTypeLike | ObjectTypeLike;
 
-    export type TSType<T extends BaseType | boolean> = T extends true ? true
+    export type TSType<T> = T extends true ? true
                 : T extends false ? false
                 : T extends StringType ? string 
                 : T extends NumberType ? number 
                 : T extends IntegerType ? number 
                 : T extends BooleanType ? boolean 
                 : T extends NullType ? null 
-                : T extends ArrayType<infer U> ? SchemaArrayWrap<U>
-                : T extends ObjectType<infer U> ? {[key in keyof U]: TSType<U[key]>}
+                : T extends ArrayType<infer U> ? ArrayWrap<U>
+                : T extends TupleType<infer U> ? { [K in keyof U]: TSType<U[K]> }
+                : T extends ObjectType<infer U> ? { [K in keyof U]: TSType<U[K]> }
                 : never
 
-    interface SchemaArrayWrap<U extends BaseType | boolean> extends Array<TSType<U>> {}
+    // FIXME: not sure why can't use MapTOTSType<T> above
+    type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
+
+    interface ArrayWrap<U extends SchemaTypeLike> extends Array<TSType<U>> {}
 }
 
 export namespace s {
@@ -142,10 +158,22 @@ export namespace s {
         };
     }
 
-    export function array<T extends t.SchemaTypeLike>(body?: Partial<t.ArrayType<T>>): t.ArrayType<T> {
+    type R = t.SchemaTypeLike;
+    export function array<T extends R>(body?: Partial<t.ArrayType<T>>): t.ArrayType<T> {
         return {
             ...body,
             'type': 'array',
         };
+    }
+
+    export function tuple<T extends R[]>(body?: Partial<t.TupleType<T>>): t.TupleType<T> {
+        return {
+            'type': 'array',
+            ...body,
+        };
+    }
+
+    export function items<T extends t.SchemaTypeLike[]>(...schema: T): T {
+        return schema;
     }
 }

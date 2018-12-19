@@ -37,4 +37,16 @@ var s;
         return __assign({}, body, { 'type': 'array' });
     }
     s.array = array;
+    function tuple(body) {
+        return __assign({ 'type': 'array' }, body);
+    }
+    s.tuple = tuple;
+    function items() {
+        var schema = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            schema[_i] = arguments[_i];
+        }
+        return schema;
+    }
+    s.items = items;
 })(s = exports.s || (exports.s = {}));

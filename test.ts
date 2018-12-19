@@ -1,28 +1,45 @@
 import {t, s} from './index';
 
+namespace meta {
+    // test if 2 types are the same
+    export type equal<A, B> = A extends B ? B extends A ? true : false : false;
+    export const equal = <A, B>(_true: equal<A, B>) => {}
+
+    namespace test {
+        equal<{}, {}>(true);
+        equal<number[], [number, number]>(false);
+        equal<true, false>(false);
+        equal<number, 1>(false);
+        equal<string, ''>(false);
+        equal<'', ''>(true);
+    }
+}
+
 {
-    const the_string = s.string({
-        'enum': ['hello'],
-    });
+    const the_string = s.string({});
     type T = t.TSType<typeof the_string>;
+    meta.equal<T, string>(true);
     ((_x: T) => {})('hello');
 }
 
 {
     const the_number = s.number();
     type T = t.TSType<typeof the_number>;
+    meta.equal<T, number>(true);
     ((_x: T) => {})(1);
 }
 
 {
     const the_integer = s.number({'title': 'integer'});
     type T = t.TSType<typeof the_integer>;
+    meta.equal<T, number>(true);
     ((_x: T) => {})(1);
 }
 
 {
     const the_boolean = s.boolean({'description': 'this is a boolean'});
     type T = t.TSType<typeof the_boolean>;
+    meta.equal<T, boolean>(true);
     ((_x: T) => {})(true);
     ((_x: T) => {})(false);
 }
@@ -30,33 +47,50 @@ import {t, s} from './index';
 {
     const the_array = s.array();
     type T = t.TSType<typeof the_array>;
+    meta.equal<T, any[]>(true);
+    meta.equal<T, number[]>(false);
+    meta.equal<T, [any, any]>(false);
     ((_x: T) => {})([]);
 }
 
 {
     const the_object = s.object();
     type T = t.TSType<typeof the_object>;
+    meta.equal<T, {}>(true);
+    meta.equal<T, {[key: string]: number}>(false);
+    meta.equal<T, any[]>(false);
     ((_x: T) => {})({});
 }
 
 {
-    const complex_array = s.array({'items': [
+    const items = s.items();
+    const tuple = s.tuple({'items': items});
+    type T = t.TSType<typeof tuple>;
+    meta.equal<T, []>(true);
+    meta.equal<T, any[]>(false);
+    ((_x: T) => {})([]);
+}
+
+{
+    const items = s.items(
         s.string(),
         s.number(),
         s.integer(),
         s.boolean(),
         s.object(),
+        s.object({
+            'properties': {
+                'hello': s.string()
+            }
+        }),
         true,
         false,
-    ]});
+    );
 
-    type T = t.TSType<typeof complex_array>;
-    ((_x: T) => {})([]);
-    ((_x: T) => {})(['hello']);
-    ((_x: T) => {})([1]);
-    ((_x: T) => {})([true]);
-    ((_x: T) => {})([false]);
-    ((_x: T) => {})([{}]);
+    const tuple = s.tuple({'items': items});
+    type T = t.TSType<typeof tuple>;
+
+    ((_x: T) => {})(['a', 2, 2, true, {}, {'hello': 'haha'}, true, false]);
 }
 
 {
@@ -72,7 +106,8 @@ import {t, s} from './index';
                     'array': s.array(),
                 }
             }),
-            'array': s.array(),
+            'array': s.array({'items': s.string()}),
+            'tuple': s.tuple({'items': s.items(s.string(), s.number(), s.object({'properties': {'hello': s.string()}}))}),
             'true': true,
             'false': false,
         },
@@ -89,6 +124,7 @@ import {t, s} from './index';
             'array': []
         },
         'array': [],
+        'tuple': ['hello', 1, {'hello': 'string'}],
         'true': true,
         'false': false,
     });
