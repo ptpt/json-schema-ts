@@ -18,6 +18,7 @@ const personSchema = s.object({
         'fullName': s.tuple({'items': s.items(s.string(), s.string())}),
         'age': s.number(),
         'friends': s.array({'items': s.string()}),
+        'sex': s.string<'male' | 'female'>({'enum': ['male', 'female']}),
     }
 });
 
@@ -29,6 +30,7 @@ type IPerson = t.TSType<typeof personSchema>;
 //     fullName: [string, string];
 //     age: number;
 //     friends: string[];
+//     sex: 'male' | 'female';
 // }
 ```
 

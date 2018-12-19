@@ -14,7 +14,7 @@ export namespace t {
         description?: string;
     }
 
-    export interface NumberType extends BaseType {
+    export interface NumberType<E extends number=number> extends BaseType {
         type: 'number';
         // strictly greater than 0
         multipleOf?: number;
@@ -23,10 +23,10 @@ export namespace t {
         minimum?: number;
         exclusiveMinimum?: number;
 
-        enum?: Array<TSType<NumberType>>;
+        enum?: Array<E>;
     }
 
-    export interface IntegerType extends BaseType {
+    export interface IntegerType<E extends number=number> extends BaseType {
         type: 'integer';
         // strictly greater than 0
         multipleOf?: number;
@@ -35,10 +35,10 @@ export namespace t {
         minimum?: number;
         exclusiveMinimum?: number;
 
-        enum?: Array<TSType<IntegerType>>;
+        enum?: Array<E>;
     }
 
-    export interface StringType extends BaseType {
+    export interface StringType<E extends string=string> extends BaseType {
         type: 'string';
         // a non-negative integer
         maxLength?: number;
@@ -47,17 +47,17 @@ export namespace t {
         pattern?: string;
         // FIXME: add more
 
-        enum?: Array<TSType<StringType>>;
+        enum?: Array<E>;
     }
 
-    export interface BooleanType extends BaseType {
+    export interface BooleanType<E extends boolean=boolean> extends BaseType {
         type: 'boolean';
-        enum?: Array<TSType<BooleanType>>;
+        enum?: Array<E>;
     }
 
-    export interface NullType extends BaseType {
+    export interface NullType<E extends null=null> extends BaseType {
         type: 'null';
-        enum?: Array<TSType<NullType>>;
+        enum?: Array<E>;
     }
 
     export interface ArrayTypeLike extends BaseType {
@@ -104,22 +104,22 @@ export namespace t {
 
     export type SchemaTypeLike = boolean | StringType | NumberType | IntegerType | BooleanType | NullType | ArrayTypeLike | TupleTypeLike | ObjectTypeLike;
 
-    export type TSType<T> = T extends true ? true
-                : T extends false ? false
-                : T extends StringType ? string 
-                : T extends NumberType ? number 
-                : T extends IntegerType ? number 
-                : T extends BooleanType ? boolean 
-                : T extends NullType ? null 
-                : T extends ArrayType<infer U> ? ArrayWrap<U>
-                : T extends TupleType<infer U> ? { [K in keyof U]: TSType<U[K]> }
-                : T extends ObjectType<infer U> ? { [K in keyof U]: TSType<U[K]> }
-                : never
-
-    // FIXME: not sure why can't use MapTOTSType<T> above
+    // FIXME: not sure why can't use MapToTSType<T> above
     type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
 
     interface ArrayWrap<U extends SchemaTypeLike> extends Array<TSType<U>> {}
+
+    export type TSType<T> = T extends true ? true
+                : T extends false ? false
+                : T extends StringType<infer U> ? U
+                : T extends NumberType<infer U> ? U
+                : T extends IntegerType<infer U> ? U
+                : T extends BooleanType<infer U> ? U
+                : T extends NullType<infer U> ? U
+                : T extends ArrayType<infer T> ? ArrayWrap<T>
+                : T extends TupleType<infer T> ? { [K in keyof T]: TSType<T[K]> }
+                : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
+                : never
 }
 
 export namespace s {
@@ -130,50 +130,51 @@ export namespace s {
         };
     }
 
-    export function number(body?: Partial<t.NumberType>): t.NumberType {
+    export function number<E extends number=number>(body?: Partial<t.NumberType<E>>): t.NumberType<E> {
         return {
             ...body,
             'type': 'number',
         };
     }
 
-    export function integer(body?: Partial<t.IntegerType>): t.IntegerType {
+    export function integer<E extends number=number>(body?: Partial<t.IntegerType<E>>): t.IntegerType<E> {
         return {
             ...body,
             'type': 'integer',
         };
     }
 
-    export function boolean(body?: Partial<t.BooleanType>): t.BooleanType {
+    export function boolean<E extends boolean=boolean>(body?: Partial<t.BooleanType<E>>): t.BooleanType<E> {
         return {
             ...body,
             'type': 'boolean',
         };
     }
 
-    export function string(body?: Partial<t.StringType>): t.StringType {
+    export function string<E extends string=string>(body?: Partial<t.StringType<E>>): t.StringType<E> {
         return {
             ...body,
             'type': 'string',
         };
     }
 
-    type R = t.SchemaTypeLike;
-    export function array<T extends R>(body?: Partial<t.ArrayType<T>>): t.ArrayType<T> {
+    type S = t.SchemaTypeLike;
+
+    export function array<T extends S>(body?: Partial<t.ArrayType<T>>): t.ArrayType<T> {
         return {
             ...body,
             'type': 'array',
         };
     }
 
-    export function tuple<T extends R[]>(body?: Partial<t.TupleType<T>>): t.TupleType<T> {
+    export function tuple<T extends S[]>(body?: Partial<t.TupleType<T>>): t.TupleType<T> {
         return {
             'type': 'array',
             ...body,
         };
     }
 
-    export function items<T extends t.SchemaTypeLike[]>(...schema: T): T {
+    export function items<T extends S[]>(...schema: T): T {
         return schema;
     }
 }

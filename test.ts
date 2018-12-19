@@ -30,10 +30,26 @@ namespace meta {
 }
 
 {
+    const the_number_enum = s.number<1 | 2>({'enum': [1, 2]});
+    type T = t.TSType<typeof the_number_enum>;
+    meta.equal<T, 1 | 2>(true);
+    ((_x: T) => {})(1);
+    ((_x: T) => {})(2);
+}
+
+{
     const the_integer = s.number({'title': 'integer'});
     type T = t.TSType<typeof the_integer>;
     meta.equal<T, number>(true);
     ((_x: T) => {})(1);
+}
+
+{
+    const the_integer_enum = s.number<1 | 2>({'enum': [1, 2]});
+    type T = t.TSType<typeof the_integer_enum>;
+    meta.equal<T, 1 | 2>(true);
+    ((_x: T) => {})(1);
+    ((_x: T) => {})(2);
 }
 
 {
@@ -42,6 +58,13 @@ namespace meta {
     meta.equal<T, boolean>(true);
     ((_x: T) => {})(true);
     ((_x: T) => {})(false);
+}
+
+{
+    const the_boolean_enum = s.boolean<true | true>({'enum': [true]});
+    type T = t.TSType<typeof the_boolean_enum>;
+    meta.equal<T, true>(true);
+    ((_x: T) => {})(true);
 }
 
 {
@@ -138,6 +161,7 @@ namespace meta {
             'fullName': s.tuple({'items': s.items(s.string(), s.string())}),
             'age': s.number(),
             'friends': s.array({'items': s.string()}),
+            'sex': s.string<'male' | 'female'>({'enum': ['male', 'female']}),
         }
     });
 
@@ -149,6 +173,7 @@ namespace meta {
         fullName: [string, string];
         age: number;
         friends: string[];
+        sex: 'male' | 'female';
     }
 
     meta.equal<IPerson, IPerson2>(true);

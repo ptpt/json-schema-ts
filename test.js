@@ -25,15 +25,32 @@ var meta;
     (function (_x) { })(1);
 }
 {
+    var the_number_enum = index_1.s.number({ 'enum': [1, 2] });
+    meta.equal(true);
+    (function (_x) { })(1);
+    (function (_x) { })(2);
+}
+{
     var the_integer = index_1.s.number({ 'title': 'integer' });
     meta.equal(true);
     (function (_x) { })(1);
+}
+{
+    var the_integer_enum = index_1.s.number({ 'enum': [1, 2] });
+    meta.equal(true);
+    (function (_x) { })(1);
+    (function (_x) { })(2);
 }
 {
     var the_boolean = index_1.s.boolean({ 'description': 'this is a boolean' });
     meta.equal(true);
     (function (_x) { })(true);
     (function (_x) { })(false);
+}
+{
+    var the_boolean_enum = index_1.s.boolean({ 'enum': [true] });
+    meta.equal(true);
+    (function (_x) { })(true);
 }
 {
     var the_array = index_1.s.array();
@@ -107,6 +124,7 @@ var meta;
             'fullName': index_1.s.tuple({ 'items': index_1.s.items(index_1.s.string(), index_1.s.string()) }),
             'age': index_1.s.number(),
             'friends': index_1.s.array({ 'items': index_1.s.string() }),
+            'sex': index_1.s.string({ 'enum': ['male', 'female'] }),
         }
     });
     meta.equal(true);
