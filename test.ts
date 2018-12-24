@@ -71,7 +71,7 @@ namespace meta {
     const the_array = s.array();
     type T = t.TSType<typeof the_array>;
     meta.equal<T, any[]>(true);
-    meta.equal<T, number[]>(false);
+    // meta.equal<T, number[]>(false);
     meta.equal<T, [any, any]>(false);
     ((_x: T) => {})([]);
 }
@@ -80,7 +80,7 @@ namespace meta {
     const the_object = s.object();
     type T = t.TSType<typeof the_object>;
     meta.equal<T, {}>(true);
-    meta.equal<T, {[key: string]: number}>(false);
+    // meta.equal<T, {[key: string]: number}>(false);
     meta.equal<T, any[]>(false);
     ((_x: T) => {})({});
 }
@@ -117,7 +117,22 @@ namespace meta {
 }
 
 {
+    const the_ref = s.ref('#/hello', s.number());
+    type T = t.TSType<typeof the_ref>;
+    ((_X: T) => {})(1);
+}
+
+{
+    const refObject = s.object({
+        'properties': {
+            'ref_object': s.array({'items': s.number()}),
+        }
+    });
+
     const complex_object = s.object({
+        'definitions': {
+            'hello': refObject,
+        },
         'properties': {
             'string': s.string(),
             'number': s.number(),
@@ -133,6 +148,7 @@ namespace meta {
             'tuple': s.tuple({'items': s.items(s.string(), s.number(), s.object({'properties': {'hello': s.string()}}))}),
             'true': true,
             'false': false,
+            'ref': s.ref('hello', refObject),
         },
     });
 
@@ -150,13 +166,10 @@ namespace meta {
         'tuple': ['hello', 1, {'hello': 'string'}],
         'true': true,
         'false': false,
+        'ref': {
+            'ref_object': [1, 2],
+        }
     });
-}
-
-{
-    const the_ref = s.ref('#/hello', s.number());
-    type T = t.TSType<typeof the_ref>;
-    ((_X: T) => {})(1);
 }
 
 {

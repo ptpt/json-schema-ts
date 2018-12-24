@@ -107,9 +107,11 @@ export namespace t {
 
     interface GenericObjectType extends ObjectType<ObjectProperties> {};
 
-    export interface RefType<T> extends BaseType {
+    export interface RefType<T extends Schema> extends BaseType {
         $ref: string;
     }
+
+    interface GenericRefType extends RefType<Schema> {};
 
     export type Schema = boolean
         | StringType
@@ -119,7 +121,8 @@ export namespace t {
         | NullType
         | GenericArrayType
         | GenericTupleType
-        | GenericObjectType;
+        | GenericObjectType
+        | GenericRefType;
 
     export interface ArrayTSType<U extends Schema> extends Array<TSType<U>> {}
 
@@ -138,7 +141,7 @@ export namespace t {
                 : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
                 : never
 
-    export type TSType<T> = T extends RefType<infer U> ? TSTypeNoRef<U> : TSTypeNoRef<T>
+    export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>
 }
 
 export namespace s {
