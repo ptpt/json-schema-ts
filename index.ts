@@ -5,13 +5,14 @@ export namespace t {
         $ref?: string;
         $comment?: string;
 
-        type: 'string' | 'number' | 'integer' | 'boolean' | 'null' | 'array' | 'object';
+        type?: 'string' | 'number' | 'integer' | 'boolean' | 'null' | 'array' | 'object';
 
         enum?: Array<string | number | boolean | null | object | any[]>;
         const?: any;
 
         title?: string;
         description?: string;
+        definitions?: { [K: string]: Schema }
     }
 
     export interface NumberType<E extends number=number> extends BaseType {
@@ -106,6 +107,10 @@ export namespace t {
 
     interface GenericObjectType extends ObjectType<ObjectProperties> {};
 
+    export interface RefType<T> extends BaseType {
+        $ref: string;
+    }
+
     export type Schema = boolean
         | StringType
         | NumberType
@@ -121,7 +126,7 @@ export namespace t {
     // FIXME: why can't use MapToTSType<T> in TSType?
     type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
 
-    export type TSType<T> = T extends true ? true
+    export type TSTypeNoRef<T> = T extends true ? true
                 : T extends false ? false
                 : T extends StringType<infer U> ? U
                 : T extends NumberType<infer U> ? U
@@ -132,6 +137,8 @@ export namespace t {
                 : T extends TupleType<infer T> ? { [K in keyof T]: TSType<T[K]> }
                 : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
                 : never
+
+    export type TSType<T> = T extends RefType<infer U> ? TSTypeNoRef<U> : TSTypeNoRef<T>
 }
 
 export namespace s {
@@ -186,5 +193,11 @@ export namespace s {
 
     export function items<T extends t.Schema[]>(...schema: T): T {
         return schema;
+    }
+
+    export function ref<T extends t.Schema>(path: string, refType: T): t.RefType<T> {
+        return {
+            '$ref': path,
+        };
     }
 }

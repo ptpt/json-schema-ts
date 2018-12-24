@@ -154,6 +154,12 @@ namespace meta {
 }
 
 {
+    const the_ref = s.ref('#/hello', s.number());
+    type T = t.TSType<typeof the_ref>;
+    ((_X: T) => {})(1);
+}
+
+{
     const personSchema = s.object({
         'title': 'person',
         'description': 'Person information',
