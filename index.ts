@@ -60,38 +60,23 @@ export namespace t {
         enum?: Array<E>;
     }
 
-    export interface ArrayTypeLike extends BaseType {
-        type: 'array';
-        items?: SchemaTypeLike;
-        enum?: ArrayWrap<SchemaTypeLike>;
-    }
-
-    export interface ArrayType<T extends SchemaTypeLike> extends BaseType {
-        type: 'array';
-        // Omitting this keyword has the same behavior as an empty schema.
-        items?: T;
-        enum?: ArrayWrap<T>;
-    }
-
-    export interface TupleTypeLike extends BaseType {
-        type: 'array';
-        // Omitting this keyword has the same behavior as an empty schema.
-        items?: SchemaTypeLike[];
-    }
-
-    export interface TupleType<T extends SchemaTypeLike[]> extends BaseType {
+    export interface ArrayType<T extends Schema> extends BaseType {
         type: 'array';
         // Omitting this keyword has the same behavior as an empty schema.
         items?: T;
     }
 
-    export type ObjectProperties = {[key: string]: SchemaTypeLike}
+    interface GenericArrayType extends ArrayType<Schema> {}
 
-    interface ObjectTypeLike extends BaseType {
-        type: 'object';
-        properties?: ObjectProperties;
-        // FIXME: enum?: Array<object>;
+    export interface TupleType<T extends Schema[]> extends BaseType {
+        type: 'array';
+        // Omitting this keyword has the same behavior as an empty schema.
+        items?: T;
     }
+
+    interface GenericTupleType extends TupleType<Schema[]> {}
+
+    export type ObjectProperties = {[key: string]: Schema}
 
     export interface ObjectType<T extends ObjectProperties> extends BaseType {
         type: 'object';
@@ -99,15 +84,24 @@ export namespace t {
         properties?: T;
         // Omitting this keyword has the same behavior as an empty array.
         required?: Array<keyof T>;
-        // FIXME: enum?: Array<object>;
     }
 
-    export type SchemaTypeLike = boolean | StringType | NumberType | IntegerType | BooleanType | NullType | ArrayTypeLike | TupleTypeLike | ObjectTypeLike;
+    interface GenericObjectType extends ObjectType<ObjectProperties> {};
 
-    // FIXME: not sure why can't use MapToTSType<T> above
+    export type Schema = boolean
+        | StringType
+        | NumberType
+        | IntegerType
+        | BooleanType
+        | NullType
+        | GenericArrayType
+        | GenericTupleType
+        | GenericObjectType;
+
+    export interface ArrayTSType<U extends Schema> extends Array<TSType<U>> {}
+
+    // FIXME: why can't use MapToTSType<T> in TSType?
     type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
-
-    interface ArrayWrap<U extends SchemaTypeLike> extends Array<TSType<U>> {}
 
     export type TSType<T> = T extends true ? true
                 : T extends false ? false
@@ -116,7 +110,7 @@ export namespace t {
                 : T extends IntegerType<infer U> ? U
                 : T extends BooleanType<infer U> ? U
                 : T extends NullType<infer U> ? U
-                : T extends ArrayType<infer T> ? ArrayWrap<T>
+                : T extends ArrayType<infer T> ? ArrayTSType<T>
                 : T extends TupleType<infer T> ? { [K in keyof T]: TSType<T[K]> }
                 : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
                 : never
@@ -158,23 +152,21 @@ export namespace s {
         };
     }
 
-    type S = t.SchemaTypeLike;
-
-    export function array<T extends S>(body?: Partial<t.ArrayType<T>>): t.ArrayType<T> {
+    export function array<T extends t.Schema>(body?: Partial<t.ArrayType<T>>): t.ArrayType<T> {
         return {
             ...body,
             'type': 'array',
         };
     }
 
-    export function tuple<T extends S[]>(body?: Partial<t.TupleType<T>>): t.TupleType<T> {
+    export function tuple<T extends t.Schema[]>(body?: Partial<t.TupleType<T>>): t.TupleType<T> {
         return {
             'type': 'array',
             ...body,
         };
     }
 
-    export function items<T extends S[]>(...schema: T): T {
+    export function items<T extends t.Schema[]>(...schema: T): T {
         return schema;
     }
 }

@@ -12,6 +12,8 @@ This package provides:
 import {s, t} from 'json-schema-ts';
 
 const personSchema = s.object({
+    'title': 'person',
+    'description': 'Persion information',
     'properties': {
         'name': s.string(),
         // [first name, last name]

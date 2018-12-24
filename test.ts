@@ -155,6 +155,8 @@ namespace meta {
 
 {
     const personSchema = s.object({
+        'title': 'person',
+        'description': 'Persion information',
         'properties': {
             'name': s.string(),
             // [first name, last name]
