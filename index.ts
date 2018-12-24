@@ -45,7 +45,6 @@ export namespace t {
         // a non-negative integer
         minLength?: number;
         pattern?: string;
-        // FIXME: add more
 
         enum?: Array<E>;
     }
@@ -64,6 +63,13 @@ export namespace t {
         type: 'array';
         // Omitting this keyword has the same behavior as an empty schema.
         items?: T;
+        // The value of this keyword MUST be a non-negative integer.
+        maxItems?: number;
+        // The value of this keyword MUST be a non-negative integer.
+        minItems?: number;
+        uniqueItems?: boolean;
+        // FIXME: An array instance is valid against "contains" if at least one of its elements is valid against the given schema.
+        // contains?: Schema;
     }
 
     interface GenericArrayType extends ArrayType<Schema> {}
@@ -72,18 +78,30 @@ export namespace t {
         type: 'array';
         // Omitting this keyword has the same behavior as an empty schema.
         items?: T;
+        // The value of this keyword MUST be a non-negative integer.
+        maxItems?: number;
+        // The value of this keyword MUST be a non-negative integer.
+        minItems?: number;
+        uniqueItems?: boolean;
+        // FIXME: An array instance is valid against "contains" if at least one of its elements is valid against the given schema.
+        // contains?: Schema;
     }
 
     interface GenericTupleType extends TupleType<Schema[]> {}
 
     export type ObjectProperties = {[key: string]: Schema}
 
-    export interface ObjectType<T extends ObjectProperties> extends BaseType {
+    export interface ObjectType<T extends ObjectProperties, AdditionalProperties extends Schema=Schema> extends BaseType {
         type: 'object';
         // Omitting this keyword has the same behavior as an empty object.
         properties?: T;
+        maxProperties?: number;
+        minProperties?: number;
         // Omitting this keyword has the same behavior as an empty array.
         required?: Array<keyof T>;
+        additionalProperties?: AdditionalProperties;
+        // FIXME: dependencies?: {};
+        propertyNames?: Schema;
     }
 
     interface GenericObjectType extends ObjectType<ObjectProperties> {};
