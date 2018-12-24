@@ -129,17 +129,17 @@ export namespace t {
     // FIXME: why can't use MapToTSType<T> in TSType?
     type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
 
-    export type TSTypeNoRef<T> = T extends true ? true
-                : T extends false ? false
-                : T extends StringType<infer U> ? U
-                : T extends NumberType<infer U> ? U
-                : T extends IntegerType<infer U> ? U
-                : T extends BooleanType<infer U> ? U
-                : T extends NullType<infer U> ? U
-                : T extends ArrayType<infer T> ? ArrayTSType<T>
-                : T extends TupleType<infer T> ? { [K in keyof T]: TSType<T[K]> }
-                : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
-                : never
+    type TSTypeNoRef<T> = T extends true ? true
+            : T extends false ? false
+            : T extends StringType<infer U> ? U
+            : T extends NumberType<infer U> ? U
+            : T extends IntegerType<infer U> ? U
+            : T extends BooleanType<infer U> ? U
+            : T extends NullType<infer U> ? U
+            : T extends ArrayType<infer T> ? ArrayTSType<T>
+            : T extends TupleType<infer T> ? { [K in keyof T]: TSType<T[K]> }
+            : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
+            : never
 
     export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>
 }

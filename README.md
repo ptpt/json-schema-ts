@@ -11,16 +11,21 @@ This package provides:
 ```typescript
 import {s, t} from 'json-schema-ts';
 
+const sex = s.string<'male' | 'female'>({'enum': ['male', 'female']});
+
 const personSchema = s.object({
     'title': 'person',
     'description': 'Person information',
+    'definitions': {
+        'sex': sex,
+    },
     'properties': {
         'name': s.string(),
         // [first name, last name]
         'fullName': s.tuple({'items': s.items(s.string(), s.string())}),
         'age': s.number(),
         'friends': s.array({'items': s.string()}),
-        'sex': s.string<'male' | 'female'>({'enum': ['male', 'female']}),
+        'sex': s.ref('#/definitions/sex', sex),
     }
 });
 
