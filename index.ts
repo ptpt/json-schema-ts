@@ -1,5 +1,5 @@
 export namespace t {
-    interface BaseType {
+    export interface BaseType {
         $id?: string;
         $schema?: string;
         $ref?: string;
