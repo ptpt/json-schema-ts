@@ -13,6 +13,19 @@ export namespace t {
         title?: string;
         description?: string;
         definitions?: { [K: string]: Schema }
+        default?: string | number | boolean | null | object | any[];
+
+        // MUST be a non-empty array. Validates successfully against all schemas
+        allOf?: Schema[];
+
+        // MUST be a non-empty array. Validates successfully against at least one schema
+        anyOf?: Schema[];
+
+        // MUST be a non-empty array. Validates successfully against exactly one schema
+        oneOf?: Schema[];
+
+        // MUST be a valid JSON Schema
+        not?: Schema;
     }
 
     export interface NumberType<E extends number=number> extends BaseType {
@@ -25,6 +38,7 @@ export namespace t {
         exclusiveMinimum?: number;
 
         enum?: Array<E>;
+        default?: number;
     }
 
     export interface IntegerType<E extends number=number> extends BaseType {
@@ -37,6 +51,7 @@ export namespace t {
         exclusiveMinimum?: number;
 
         enum?: Array<E>;
+        default?: number;
     }
 
     export interface StringType<E extends string=string> extends BaseType {
@@ -48,16 +63,19 @@ export namespace t {
         pattern?: string;
 
         enum?: Array<E>;
+        default?: string;
     }
 
     export interface BooleanType<E extends boolean=boolean> extends BaseType {
         type: 'boolean';
         enum?: Array<E>;
+        default?: boolean;
     }
 
     export interface NullType<E extends null=null> extends BaseType {
         type: 'null';
         enum?: Array<E>;
+        default?: null;
     }
 
     export interface ArrayType<T extends Schema> extends BaseType {
@@ -71,6 +89,7 @@ export namespace t {
         uniqueItems?: boolean;
         // FIXME: An array instance is valid against "contains" if at least one of its elements is valid against the given schema.
         // contains?: Schema;
+        default?: any[];
     }
 
     interface GenericArrayType extends ArrayType<Schema> {}
@@ -86,6 +105,11 @@ export namespace t {
         uniqueItems?: boolean;
         // FIXME: An array instance is valid against "contains" if at least one of its elements is valid against the given schema.
         // contains?: Schema;
+        default?: any[];
+    }
+
+    export interface AnyOfType<T extends Schema[]> extends BaseType {
+        anyOf: T;
     }
 
     interface GenericTupleType extends TupleType<Schema[]> {}
@@ -103,6 +127,7 @@ export namespace t {
         additionalProperties?: AdditionalProperties;
         // FIXME: dependencies?: {};
         propertyNames?: Schema;
+        default?: object;
     }
 
     interface GenericObjectType extends ObjectType<ObjectProperties> {};
@@ -139,6 +164,7 @@ export namespace t {
             : T extends ArrayType<infer T> ? ArrayTSType<T>
             : T extends TupleType<infer T> ? { [K in keyof T]: TSType<T[K]> }
             : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
+            : T extends AnyOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }
             : never
 
     export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>
@@ -194,8 +220,9 @@ export namespace s {
         };
     }
 
-    export function items<T extends t.Schema[]>(...schema: T): T {
-        return schema;
+    // works with tuple
+    export function items<T extends t.Schema[]>(...schemas: T): T {
+        return schemas;
     }
 
     export function ref<T extends t.Schema>(path: string, refType: T): t.RefType<T> {
@@ -203,4 +230,26 @@ export namespace s {
             '$ref': path,
         };
     }
+
+    export function anyOf<T extends t.Schema[]>(...schemas: T): t.AnyOfType<T> {
+        if (schemas.length < 1) {
+            throw new Error();
+        }
+        return {
+            'anyOf': schemas,
+        };
+    }
+
+    // export function oneOf<T extends t.Schema[]>(...schemas: T): T {
+    //     if (schemas.length < 1) {
+    //         throw new Error();
+    //     }
+    //     return schemas;
+    // }
+
+    // export function allOf<T1 extends t.Schema, T2 extends t.Schema>(schema1: T1, schema2: T2): T1 & T2 {
+    //     return {
+    //         'allOf': [schema1, schema2],
+    //     };
+    // }
 }

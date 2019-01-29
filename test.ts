@@ -16,7 +16,9 @@ namespace meta {
 }
 
 {
-    const the_string = s.string({});
+    const the_string = s.string({
+        'default': 'test',
+    });
     type T = t.TSType<typeof the_string>;
     meta.equal<T, string>(true);
     ((_x: T) => {})('hello');
@@ -53,7 +55,7 @@ namespace meta {
 }
 
 {
-    const the_boolean = s.boolean({'description': 'this is a boolean'});
+    const the_boolean = s.boolean({'description': 'this is a boolean', 'default': false});
     type T = t.TSType<typeof the_boolean>;
     meta.equal<T, boolean>(true);
     ((_x: T) => {})(true);
@@ -68,7 +70,9 @@ namespace meta {
 }
 
 {
-    const the_array = s.array();
+    const the_array = s.array({
+        default: [],
+    });
     type T = t.TSType<typeof the_array>;
     meta.equal<T, any[]>(true);
     // meta.equal<T, number[]>(false);
@@ -77,7 +81,9 @@ namespace meta {
 }
 
 {
-    const the_object = s.object();
+    const the_object = s.object({
+        'default': {},
+    });
     type T = t.TSType<typeof the_object>;
     meta.equal<T, {}>(true);
     // meta.equal<T, {[key: string]: number}>(false);
