@@ -108,11 +108,25 @@ export namespace t {
         default?: any[];
     }
 
+    interface GenericTupleType extends TupleType<Schema[]> {}
+
     export interface AnyOfType<T extends Schema[]> extends BaseType {
         anyOf: T;
     }
 
-    interface GenericTupleType extends TupleType<Schema[]> {}
+    interface GenericAnyOfType extends AnyOfType<Schema[]> {}
+
+    export interface OneOfType<T extends Schema[]> extends BaseType {
+        oneOf: T;
+    }
+
+    interface GenericOneOfType extends OneOfType<Schema[]> {}
+
+    export interface AllOfType<T extends Schema[]> extends BaseType {
+        allOf: T;
+    }
+
+    interface GenericAllOfType extends OneOfType<Schema[]> {}
 
     export type ObjectProperties = {[key: string]: Schema}
 
@@ -144,6 +158,9 @@ export namespace t {
         | IntegerType
         | BooleanType
         | NullType
+        | GenericAnyOfType
+        | GenericOneOfType
+        | GenericAllOfType
         | GenericArrayType
         | GenericTupleType
         | GenericObjectType
@@ -151,7 +168,6 @@ export namespace t {
 
     export interface ArrayTSType<U extends Schema> extends Array<TSType<U>> {}
 
-    // FIXME: why can't use MapToTSType<T> in TSType?
     type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
 
     type TSTypeNoRef<T> = T extends true ? true
@@ -162,9 +178,13 @@ export namespace t {
             : T extends BooleanType<infer U> ? U
             : T extends NullType<infer U> ? U
             : T extends ArrayType<infer T> ? ArrayTSType<T>
-            : T extends TupleType<infer T> ? { [K in keyof T]: TSType<T[K]> }
-            : T extends ObjectType<infer T> ? { [K in keyof T]: TSType<T[K]> }
-            : T extends AnyOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }
+            : T extends TupleType<infer T> ? MapToTSType<T>
+            : T extends ObjectType<infer T> ? MapToTSType<T>
+            // tuple to union. See https://github.com/Microsoft/TypeScript/issues/13298#issuecomment-423385929
+            : T extends AnyOfType<infer T> ? MapToTSType<T>[number]
+            : T extends OneOfType<infer T> ? MapToTSType<T>[number]
+            // FIXME: how to convert tuple to intersection type?
+            : T extends AllOfType<infer T> ? MapToTSType<T>[number]
             : never
 
     export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>
@@ -233,23 +253,28 @@ export namespace s {
 
     export function anyOf<T extends t.Schema[]>(...schemas: T): t.AnyOfType<T> {
         if (schemas.length < 1) {
-            throw new Error();
+            throw new Error('anyOf must be a non-empty array');
         }
         return {
             'anyOf': schemas,
         };
     }
 
-    // export function oneOf<T extends t.Schema[]>(...schemas: T): T {
-    //     if (schemas.length < 1) {
-    //         throw new Error();
-    //     }
-    //     return schemas;
-    // }
+    export function oneOf<T extends t.Schema[]>(...schemas: T): t.OneOfType<T> {
+        if (schemas.length < 1) {
+            throw new Error('oneOf must be a non-empty array');
+        }
+        return {
+            'oneOf': schemas,
+        };
+    }
 
-    // export function allOf<T1 extends t.Schema, T2 extends t.Schema>(schema1: T1, schema2: T2): T1 & T2 {
-    //     return {
-    //         'allOf': [schema1, schema2],
-    //     };
-    // }
+    export function allOf<T extends t.Schema[]>(...schemas: T): t.AllOfType<T> {
+        if (schemas.length < 1) {
+            throw new Error('allOf must be a non-empty array');
+        }
+        return {
+            'allOf': schemas,
+        };
+    }
 }

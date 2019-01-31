@@ -129,6 +129,20 @@ namespace meta {
 }
 
 {
+    const string = s.string({});
+    const integer = s.integer({});
+    const any_of = s.anyOf(integer, string);
+    const one_of = s.oneOf(string, integer);
+    const all_of = s.allOf(string, integer);
+    type T1 = t.TSType<typeof any_of>;
+    type T2 = t.TSType<typeof one_of>;
+    type T3 = t.TSType<typeof all_of>;
+    meta.equal<T1, string | number>(true);
+    meta.equal<T2, string | number>(true);
+    meta.equal<T3, string | number>(true);
+}
+
+{
     const refObject = s.object({
         'properties': {
             'ref_object': s.array({'items': s.number()}),
