@@ -168,6 +168,7 @@ export namespace t {
 
     export interface ArrayTSType<U extends Schema> extends Array<TSType<U>> {}
 
+    // FIXME: why can't use MapToTSType<T> in TSType
     type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
 
     type TSTypeNoRef<T> = T extends true ? true
@@ -181,10 +182,10 @@ export namespace t {
             : T extends TupleType<infer T> ? MapToTSType<T>
             : T extends ObjectType<infer T> ? MapToTSType<T>
             // tuple to union. See https://github.com/Microsoft/TypeScript/issues/13298#issuecomment-423385929
-            : T extends AnyOfType<infer T> ? MapToTSType<T>[number]
-            : T extends OneOfType<infer T> ? MapToTSType<T>[number]
+            : T extends AnyOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
+            : T extends OneOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
             // FIXME: how to convert tuple to intersection type?
-            : T extends AllOfType<infer T> ? MapToTSType<T>[number]
+            : T extends AllOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
             : never
 
     export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>

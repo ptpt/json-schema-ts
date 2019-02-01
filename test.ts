@@ -130,10 +130,10 @@ namespace meta {
 
 {
     const string = s.string({});
-    const integer = s.integer({});
-    const any_of = s.anyOf(integer, string);
-    const one_of = s.oneOf(string, integer);
-    const all_of = s.allOf(string, integer);
+    const tuple = s.tuple({'items': s.items(s.string(), s.integer())});
+    const any_of = s.anyOf(tuple, string);
+    const one_of = s.oneOf(string, tuple);
+    const all_of = s.allOf(string, tuple);
     type T1 = t.TSType<typeof any_of>;
     type T2 = t.TSType<typeof one_of>;
     type T3 = t.TSType<typeof all_of>;
@@ -203,11 +203,17 @@ namespace meta {
         },
         'properties': {
             'name': s.string(),
-            // [first name, last name]
-            'fullName': s.tuple({'items': s.items(s.string(), s.string())}),
+            'fullName': s.object({'properties': {
+                'firstName': s.string(),
+                'lastName': s.string(),
+            }}),
             'age': s.number(),
             'friends': s.array({'items': s.string()}),
             'sex': s.ref('#/definitions/sex', sex),
+            'location': s.oneOf(
+                s.string(),
+                s.tuple({'items': s.items(s.number(), s.number())}),
+            )
         }
     });
 
@@ -216,10 +222,14 @@ namespace meta {
     // IPerson is equivalent to
     interface IPerson2 {
         name: string;
-        fullName: [string, string];
+        fullName: {
+            firstName: string,
+            lastName: string,
+        };
         age: number;
         friends: string[];
         sex: 'male' | 'female';
+        location: string | [number, number];
     }
 
     meta.equal<IPerson, IPerson2>(true);
