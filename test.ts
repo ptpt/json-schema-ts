@@ -16,6 +16,17 @@ namespace meta {
 }
 
 {
+    const the_true = true;
+    type T = t.TSType<typeof the_true>;
+    meta.equal<T, any>(true);
+}
+
+{
+    const the_false = false;
+    type T = t.TSType<typeof the_false>;
+}
+
+{
     const the_string = s.string({
         'default': 'test',
     });
@@ -71,13 +82,39 @@ namespace meta {
 
 {
     const the_array = s.array({
-        default: [],
+        'default': [],
+        'items': s.string(),
     });
     type T = t.TSType<typeof the_array>;
-    meta.equal<T, any[]>(true);
-    // meta.equal<T, number[]>(false);
+    type a = T[number];
+    meta.equal<a, string>(true);
+    meta.equal<T, string[]>(true);
+    meta.equal<T, number[]>(false);
     meta.equal<T, [any, any]>(false);
     ((_x: T) => {})([]);
+}
+
+{
+    const the_array = s.array({
+        'items': true,
+    });
+    type T = t.TSType<typeof the_array>;
+    type a = T[number];
+    meta.equal<a, any>(true);
+    meta.equal<T, any[]>(true);
+    // any extends string, and string extends any
+    meta.equal<T, string[]>(true);
+    meta.equal<T, [any, any]>(false);
+    ((_x: T) => {})([]);
+}
+
+{
+    const the_array = s.array({
+        'items': false,
+    });
+    type T = t.TSType<typeof the_array>;
+    type a = T[number];
+    // FIXME: how to test never?
 }
 
 {
@@ -88,6 +125,7 @@ namespace meta {
     meta.equal<T, {}>(true);
     // meta.equal<T, {[key: string]: number}>(false);
     meta.equal<T, any[]>(false);
+    meta.equal<T, string>(false);
     ((_x: T) => {})({});
 }
 
@@ -113,13 +151,21 @@ namespace meta {
             }
         }),
         true,
-        false,
+        // false,
     );
 
     const tuple = s.tuple({'items': items});
     type T = t.TSType<typeof tuple>;
 
-    ((_x: T) => {})(['a', 2, 2, true, {}, {'hello': 'haha'}, true, false]);
+    ((_x: T) => {})([
+        'a',
+        2,
+        2,
+        true,
+        {},
+        {'hello': 'haha'},
+        ['asas', 1, true, false, {}],
+]);
 }
 
 {
@@ -167,7 +213,7 @@ namespace meta {
             'array': s.array({'items': s.string()}),
             'tuple': s.tuple({'items': s.items(s.string(), s.number(), s.object({'properties': {'hello': s.string()}}))}),
             'true': true,
-            'false': false,
+            // 'false': false,
             'ref': s.ref('hello', refObject),
         },
     });
@@ -184,8 +230,8 @@ namespace meta {
         },
         'array': [],
         'tuple': ['hello', 1, {'hello': 'string'}],
-        'true': true,
-        'false': false,
+        'true': ['hello', 1, true, false],
+        // 'false': false,
         'ref': {
             'ref_object': [1, 2],
         }

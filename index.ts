@@ -171,8 +171,8 @@ export namespace t {
     // FIXME: why can't use MapToTSType<T> in TSType
     type MapToTSType<T> = { [K in keyof T]: TSType<T[K]> };
 
-    type TSTypeNoRef<T> = T extends true ? true
-            : T extends false ? false
+    type TSTypeNoRef<T> = T extends true ? any
+            : T extends false ? never
             : T extends StringType<infer U> ? U
             : T extends NumberType<infer U> ? U
             : T extends IntegerType<infer U> ? U
@@ -186,7 +186,7 @@ export namespace t {
             : T extends OneOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
             // FIXME: how to convert tuple to intersection type?
             : T extends AllOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
-            : never
+            : never;
 
     export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>
 }
