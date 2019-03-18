@@ -246,7 +246,7 @@ export namespace s {
         return schemas;
     }
 
-    export function ref<T extends t.Schema>(path: string, refType: T): t.RefType<T> {
+    export function ref<T extends t.Schema>(path: string): t.RefType<T> {
         return {
             '$ref': path,
         };

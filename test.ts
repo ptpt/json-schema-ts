@@ -169,7 +169,7 @@ namespace meta {
 }
 
 {
-    const the_ref = s.ref('#/hello', s.number());
+    const the_ref = s.ref<t.NumberType>('#/hello');
     type T = t.TSType<typeof the_ref>;
     ((_X: T) => {})(1);
 }
@@ -214,7 +214,7 @@ namespace meta {
             'tuple': s.tuple({'items': s.items(s.string(), s.number(), s.object({'properties': {'hello': s.string()}}))}),
             'true': true,
             // 'false': false,
-            'ref': s.ref('hello', refObject),
+            'ref': s.ref<typeof refObject>('hello'),
         },
     });
 
@@ -255,7 +255,7 @@ namespace meta {
             }}),
             'age': s.number(),
             'friends': s.array({'items': s.string()}),
-            'sex': s.ref('#/definitions/sex', sex),
+            'sex': s.ref<typeof sex>('#/definitions/sex'),
             'location': s.oneOf(
                 s.string(),
                 s.tuple({'items': s.items(s.number(), s.number())}),
