@@ -34,7 +34,7 @@ const personSchema = s.object({
         }}),
         'age': s.number(),
         'friends': s.array({'items': s.string()}),
-        'sex': s.ref('#/definitions/sex', sex),
+        'sex': s.ref<typeof sex>('#/definitions/sex'),
         'location': s.oneOf(
             s.string(),
             s.tuple({'items': s.items(s.number(), s.number())}),
