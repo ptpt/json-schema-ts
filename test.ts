@@ -117,7 +117,18 @@ namespace meta {
     // FIXME: how to test never?
 }
 
-// FIXME: s.object() does not work
+// FIXME: s.object() doesn't work
+// {
+//     const the_object = s.object();
+//     type T = t.TSType<typeof the_object>;
+//     meta.equal<T, {}>(true);
+//     // meta.equal<T, {[key: string]: number}>(false);
+//     meta.equal<T, any[]>(false);
+//     meta.equal<T, string>(false);
+//     ((_x: T) => {})({});
+// }
+
+// FIXME: s.object() doesn't work
 // {
 //     const the_object = s.object({
 //     });
@@ -128,6 +139,19 @@ namespace meta {
 //     meta.equal<T, string>(false);
 //     ((_x: T) => {})({});
 // }
+
+{
+    const the_object = s.object({
+        'properties': {
+        }
+    });
+    type T = t.TSType<typeof the_object>;
+    meta.equal<T, {}>(true);
+    // meta.equal<T, {[key: string]: number}>(false);
+    meta.equal<T, any[]>(false);
+    meta.equal<T, string>(false);
+    ((_x: T) => {})({});
+}
 
 {
     const the_object = s.object({
@@ -159,7 +183,7 @@ namespace meta {
         s.number(),
         s.integer(),
         s.boolean(),
-        // FIXME
+        // FIXME: s.object() doesn't work
         // s.object(),
         s.object({
             'properties': {
@@ -181,8 +205,22 @@ namespace meta {
         // {},
         {'hello': 'haha'},
         ['asas', 1, true, false, {}],
-]);
+    ]);
 }
+
+// FIXME: s.object() doesn't work
+// {
+//     const items = s.items(
+//         s.object(),
+//     );
+
+//     const tuple = s.tuple({'items': items});
+//     type T = t.TSType<typeof tuple>;
+
+//     ((_x: T) => {})([
+//         {},
+//     ]);
+// }
 
 {
     const the_ref = s.ref<t.NumberType>('#/hello');
