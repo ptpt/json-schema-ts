@@ -178,14 +178,14 @@ export namespace t {
             : T extends IntegerType<infer U> ? U
             : T extends BooleanType<infer U> ? U
             : T extends NullType<infer U> ? U
-            : T extends ArrayType<infer T> ? ArrayTSType<T>
-            : T extends TupleType<infer T> ? MapToTSType<T>
-            : T extends ObjectType<infer T> ? MapToTSType<T>
+            : T extends ArrayType<infer U> ? ArrayTSType<U>
+            : T extends TupleType<infer U> ? MapToTSType<U>
+            : T extends ObjectType<infer U> ? MapToTSType<U>
             // tuple to union. See https://github.com/Microsoft/TypeScript/issues/13298#issuecomment-423385929
-            : T extends AnyOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
-            : T extends OneOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
+            : T extends AnyOfType<infer U> ? { [K in keyof U]: TSType<U[K]> }[number]
+            : T extends OneOfType<infer U> ? { [K in keyof U]: TSType<U[K]> }[number]
             // FIXME: how to convert tuple to intersection type?
-            : T extends AllOfType<infer T> ? { [K in keyof T]: TSType<T[K]> }[number]
+            : T extends AllOfType<infer U> ? { [K in keyof U]: TSType<U[K]> }[number]
             : never;
 
     export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>
@@ -236,8 +236,8 @@ export namespace s {
 
     export function tuple<T extends t.Schema[]>(body?: Partial<t.TupleType<T>>): t.TupleType<T> {
         return {
-            'type': 'array',
             ...body,
+            'type': 'array',
         };
     }
 
