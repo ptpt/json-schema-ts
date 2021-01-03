@@ -117,28 +117,18 @@ namespace meta {
     // FIXME: how to test never?
 }
 
-// FIXME: s.object() doesn't work
-// {
-//     const the_object = s.object();
-//     type T = t.TSType<typeof the_object>;
-//     meta.equal<T, {}>(true);
-//     // meta.equal<T, {[key: string]: number}>(false);
-//     meta.equal<T, any[]>(false);
-//     meta.equal<T, string>(false);
-//     ((_x: T) => {})({});
-// }
-
-// FIXME: s.object() doesn't work
-// {
-//     const the_object = s.object({
-//     });
-//     type T = t.TSType<typeof the_object>;
-//     meta.equal<T, {}>(true);
-//     // meta.equal<T, {[key: string]: number}>(false);
-//     meta.equal<T, any[]>(false);
-//     meta.equal<T, string>(false);
-//     ((_x: T) => {})({});
-// }
+{
+    // FIXME: s.object() or s.object({}) doesn't work
+    const the_object = s.object({
+        'properties': {}
+    });
+    type T = t.TSType<typeof the_object>;
+    meta.equal<T, {}>(true);
+    // meta.equal<T, {[key: string]: number}>(false);
+    meta.equal<T, any[]>(false);
+    meta.equal<T, string>(false);
+    ((_x: T) => {})({});
+}
 
 {
     const the_object = s.object({
@@ -208,19 +198,21 @@ namespace meta {
     ]);
 }
 
-// FIXME: s.object() doesn't work
-// {
-//     const items = s.items(
-//         s.object(),
-//     );
+{
+    // FIXME: s.object() doesn't work
+    const items = s.items(
+        s.object({
+            'properties': {}
+        }),
+    );
 
-//     const tuple = s.tuple({'items': items});
-//     type T = t.TSType<typeof tuple>;
+    const tuple = s.tuple({'items': items});
+    type T = t.TSType<typeof tuple>;
 
-//     ((_x: T) => {})([
-//         {},
-//     ]);
-// }
+    ((_x: T) => {})([
+        {},
+    ]);
+}
 
 {
     const the_ref = s.ref<t.NumberType>('#/hello');
@@ -259,7 +251,7 @@ namespace meta {
             'integer': s.integer(),
             'boolean': s.boolean(),
             // FIXME: s.object() does not work
-            // 'object': s.object(),
+            'object': s.object({'properties': {}}),
             'nested_object': s.object({
                 'properties': {
                     // FIXME: s.array() does not work
@@ -280,7 +272,7 @@ namespace meta {
         'number': 1,
         'integer': 1,
         'boolean': true,
-        // 'object': {},
+        'object': {},
         'nested_object': {
             'array': [],
         },
