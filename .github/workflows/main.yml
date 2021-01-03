@@ -21,7 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [12.x, 14.x]
+        ts-version: [3.x, 4.x, latest]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -36,6 +37,7 @@ jobs:
       - name: Install
         run: |
           npm install
+          npm install typescript@${{ matrix.ts-version }}
 
       - name: Compile
         run: |
