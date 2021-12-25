@@ -92,8 +92,6 @@ export namespace t {
         default?: any[];
     }
 
-    interface GenericArrayType extends ArrayType<Schema> {}
-
     export interface TupleType<T extends Schema[]> extends BaseType {
         type: 'array';
         // Omitting this keyword has the same behavior as an empty schema.
@@ -108,25 +106,17 @@ export namespace t {
         default?: any[];
     }
 
-    interface GenericTupleType extends TupleType<Schema[]> {}
-
     export interface AnyOfType<T extends Schema[]> extends BaseType {
         anyOf: T;
     }
-
-    interface GenericAnyOfType extends AnyOfType<Schema[]> {}
 
     export interface OneOfType<T extends Schema[]> extends BaseType {
         oneOf: T;
     }
 
-    interface GenericOneOfType extends OneOfType<Schema[]> {}
-
     export interface AllOfType<T extends Schema[]> extends BaseType {
         allOf: T;
     }
-
-    interface GenericAllOfType extends OneOfType<Schema[]> {}
 
     export type ObjectProperties = {[key: string]: Schema}
 
@@ -137,20 +127,19 @@ export namespace t {
         maxProperties?: number;
         minProperties?: number;
         // Omitting this keyword has the same behavior as an empty array.
-        required?: Array<keyof T>;
+
+        // This is broken in TS 4.3 and above ;(
+        // required?: Array<keyof T>;
+        required?: string[];
         additionalProperties?: AdditionalProperties;
         // FIXME: dependencies?: {};
         propertyNames?: Schema;
         default?: object;
     }
 
-    interface GenericObjectType extends ObjectType<ObjectProperties> {};
-
     export interface RefType<T extends Schema> extends BaseType {
         $ref: string;
     }
-
-    interface GenericRefType extends RefType<Schema> {};
 
     export type Schema = boolean
         | StringType
@@ -158,13 +147,13 @@ export namespace t {
         | IntegerType
         | BooleanType
         | NullType
-        | GenericAnyOfType
-        | GenericOneOfType
-        | GenericAllOfType
-        | GenericArrayType
-        | GenericTupleType
-        | GenericObjectType
-        | GenericRefType;
+        | AnyOfType<Schema[]>
+        | OneOfType<Schema[]>
+        | OneOfType<Schema[]>
+        | ArrayType<Schema>
+        | TupleType<Schema[]>
+        | ObjectType<ObjectProperties>
+        | RefType<Schema>;
 
     export interface ArrayTSType<U extends Schema> extends Array<TSType<U>> {}
 
