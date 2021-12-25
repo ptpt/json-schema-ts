@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x, 16.x, latest]
+        node-version: [14.x, 16.x]
         ts-version: [4.3, 4.4, 4.5, 4.x]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
