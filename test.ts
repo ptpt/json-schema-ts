@@ -174,7 +174,7 @@ namespace meta {
         s.integer(),
         s.boolean(),
         // FIXME: s.object() doesn't work
-        // s.object(),
+        s.object({"properties": {}}),
         s.object({
             'properties': {
                 'hello': s.string()
@@ -192,7 +192,7 @@ namespace meta {
         2,
         2,
         true,
-        // {},
+        {},
         {'hello': 'haha'},
         ['asas', 1, true, false, {}],
     ]);
