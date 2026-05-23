@@ -170,11 +170,10 @@ export namespace t {
             : T extends ArrayType<infer U> ? ArrayTSType<U>
             : T extends TupleType<infer U> ? MapToTSType<U>
             : T extends ObjectType<infer U> ? MapToTSType<U>
-            // tuple to union. See https://github.com/Microsoft/TypeScript/issues/13298#issuecomment-423385929
-            : T extends AnyOfType<infer U> ? { [K in keyof U]: TSType<U[K]> }[number]
-            : T extends OneOfType<infer U> ? { [K in keyof U]: TSType<U[K]> }[number]
+            : T extends AnyOfType<infer U> ? TSType<U[number]>
+            : T extends OneOfType<infer U> ? TSType<U[number]>
             // FIXME: how to convert tuple to intersection type?
-            : T extends AllOfType<infer U> ? { [K in keyof U]: TSType<U[K]> }[number]
+            : T extends AllOfType<infer U> ? TSType<U[number]>
             : never;
 
     export type TSType<T> = T extends RefType<infer S> ? TSTypeNoRef<S> : TSTypeNoRef<T>
